@@ -23,11 +23,39 @@ const getTour = asyncHandler(async (req, res) => {
 
 //Filtering, sorting & pagination
 const getTours = asyncHandler(async (req, res) => {
-  const tours = await Tour.find();
-  return res.status(200).json({
-    success: tours ? true : false,
-    toursData: tours ? tours : "Cannot get tours",
-  });
+  const queries = {...req.query};
+  // Tách các trường đặc biệt ra khỏi query
+  const excludeFields = ['limit', 'sort', 'page', 'fields'];
+  excludeFields.forEach(el => delete queries[el]);
+
+  // Format lại các operators cho đúng cú pháp của mongoose
+  let queryString = JSON.stringify(queries);
+  queryString = queryString.replace(/\b(gte|gt|lt|lte)\b/g, matchedEl => `$${matchedEl}`);
+  const formatedQueries = JSON.parse(queryString);
+
+  // Filtering
+  if (queries?.name) formatedQueries.name = {$regex: queries.name, $options: 'i'}
+  let queryCommand = Tour.find(formatedQueries)
+
+  // Sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(',').join(' ');
+    queryCommand = queryCommand.sort(sortBy);
+  }
+
+  // Execute query
+  // Số lượng sp thỏa mãn điều kiện !== số lượng sp trả về 1 lần gọi API
+  try {
+    const response = await queryCommand.exec();
+    const counts = await Tour.find(formatedQueries).countDocuments()
+    return res.status(200).json({
+      success: response ? true : false,
+      toursData: response ? response : "Cannot get tours",
+      counts,
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
 });
 
 const updateTour = asyncHandler(async (req, res) => {
