@@ -4,6 +4,7 @@ const { verifyAccessToken, isAdmin } = require("../middlewares/verifyToken");
 
 router.post("/", [verifyAccessToken, isAdmin], ctrls.createTour);
 router.get("/", ctrls.getTours);
+router.put("/ratings", verifyAccessToken, ctrls.ratings);
 
 router.put("/:tid", [verifyAccessToken, isAdmin], ctrls.updateTour);
 router.delete("/:tid", [verifyAccessToken, isAdmin], ctrls.deleteTour);

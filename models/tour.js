@@ -27,7 +27,7 @@ var tourSchema = new mongoose.Schema(
     },
     ratings: [
       {
-        start: { type: String, required: true },
+        star: { type: Number, required: true },
         postedBy: { type: mongoose.Types.ObjectId, ref: "User" },
         comment: { type: String },
       },
