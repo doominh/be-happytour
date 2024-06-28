@@ -131,8 +131,17 @@ const ratings = asyncHandler(async (req, res) => {
     console.log(response);
   }
 
+  // Sum ratings
+  const updatedTour = await Tour.findById(tid);
+  const ratingCount = updatedTour.ratings.length;
+  const sumRatings = updatedTour.ratings.reduce((sum, el) => sum + +el.star, 0);
+  updatedTour.totalRatings = Math.round(sumRatings * 10 / ratingCount) / 10;
+
+  await updatedTour.save();
+
   return res.status(200).json({
     success: true,
+    updatedTour,
   });
 });
 
