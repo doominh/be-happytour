@@ -40,14 +40,18 @@ var tourSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Category",
     },
-    tour_active: {
-      type: mongoose.Types.ObjectId,
-      ref: "Tour_active",
-    },
-    destination: {
-      type: mongoose.Types.ObjectId,
-      ref: "Destination",
-    },
+    tour_active: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Tour_active",
+      }
+    ],
+    destination: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Destination",
+      },
+    ],
   },
   {
     timestamps: true,

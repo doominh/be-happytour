@@ -112,8 +112,7 @@ const ratings = asyncHandler(async (req, res) => {
       {
         _id: tid,
         "ratings._id": alreadyRating._id, // Tìm phần tử cụ thể trong mảng ratings
-      }
-      ,
+      },
       {
         $set: { "ratings.$.star": star, "ratings.$.comment": comment },
       },
@@ -135,13 +134,29 @@ const ratings = asyncHandler(async (req, res) => {
   const updatedTour = await Tour.findById(tid);
   const ratingCount = updatedTour.ratings.length;
   const sumRatings = updatedTour.ratings.reduce((sum, el) => sum + +el.star, 0);
-  updatedTour.totalRatings = Math.round(sumRatings * 10 / ratingCount) / 10;
+  updatedTour.totalRatings = Math.round((sumRatings * 10) / ratingCount) / 10;
 
   await updatedTour.save();
 
   return res.status(200).json({
     success: true,
     updatedTour,
+  });
+});
+
+const uploadImagesTour = asyncHandler(async (req, res) => {
+  const { tid } = req.params;
+  if (!req.files) throw new Error("Missing inputs");
+  const response = await Tour.findByIdAndUpdate(
+    tid,
+    {
+      $push: { images: { $each: req.files.map((el) => el.path) } },
+    },
+    { new: true }
+  );
+  return res.status(200).json({
+    status: response ? true : false,
+    updatedTour: response ? response : "Cannot upload images tour",
   });
 });
 
@@ -152,4 +167,5 @@ module.exports = {
   updateTour,
   deleteTour,
   ratings,
+  uploadImagesTour,
 };
