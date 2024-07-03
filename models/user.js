@@ -30,10 +30,12 @@ var userSchema = new mongoose.Schema({
     type: String,
     default: "user",
   },
-  booking: {
-    type: Array,
-    default: [],
-  },
+  booking: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Booking",
+    }
+  ],
   comment: [{type: mongoose.Types.ObjectId, ref: 'Address'}],
   isBlocked: {
     type: Boolean,

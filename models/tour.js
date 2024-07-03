@@ -40,10 +40,10 @@ var tourSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Category",
     },
-    tour_active: [
+    booking: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "Tour_active",
+        ref: "Booking",
       }
     ],
     destination: [

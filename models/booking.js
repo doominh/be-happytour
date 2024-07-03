@@ -7,15 +7,33 @@ var bookingSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Tour",
     },
+    trip: {
+      type: mongoose.Types.ObjectId,
+      ref: "Trip",
+    },
     status: {
       type: String,
       default: "Processing",
       enum: ["Cancelled", "Processing", "Success"],
     },
-    paymentIntent: {},
     orderBy: {
       type: mongoose.Types.ObjectId,
       ref: "User",
+    },
+    adult: {
+      type: Number,
+      required: true
+    },
+    children: {
+      type: Number,
+      default: 0
+    },
+    infant: {
+      type: Number,
+      default: 0
+    },
+    total: {
+      type: Number
     },
   },
   { timestamps: true }

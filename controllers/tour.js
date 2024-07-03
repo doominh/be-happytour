@@ -56,7 +56,7 @@ const getTours = asyncHandler(async (req, res) => {
   // limit: số object lấy về 1 lần gọi API trong 1 trang
   // Skip: 2 => bỏ qua 2 object đầu tiên
   const page = +req.query.page || 1;
-  const limit = +req.query.limit || process.env.LIMIT_PRODUCTS;
+  const limit = +req.query.limit || process.env.LIMIT_TOURS;
   const skip = (page - 1) * limit;
   queryCommand.skip(skip).limit(limit);
 
