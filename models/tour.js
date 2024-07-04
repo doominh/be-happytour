@@ -40,6 +40,12 @@ var tourSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Category",
     },
+    trip: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Trip",
+      }
+    ],
     booking: [
       {
         type: mongoose.Types.ObjectId,

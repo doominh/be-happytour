@@ -1,16 +1,54 @@
 const Trip = require("../models/trip");
+const Tour = require("../models/tour");
 const asyncHandler = require("express-async-handler");
 
 const createTrip = asyncHandler(async (req, res) => {
-    if (Object.keys(req.body).length === 0) throw new Error("Missing inputs");
-    if (req.body && req.body.name) req.body.slug = slugify(req.body.name);
-    const newTour = await Tour.create(req.body);
-    return res.status(200).json({
-      success: newTour ? true : false,
-      createdTour: newTour ? newTour : "Cannot create new tour",
-    });
+  const { tid, vehicel, licensePlate } = req.body;
+  if (!tid || !vehicel || !licensePlate) throw new Error("Missing inputs");
+  // check trùng licensePlate
+  const existingTrip = await Trip.findOne({licensePlate});
+  if (existingTrip) throw new Error("This trip already exists");
+
+  // Tạo trip mới nếu không trùng
+  const response = await Trip.create({ tour: tid, vehicel, licensePlate });
+  await Tour.findByIdAndUpdate(tid, { $push: { trip: response._id } });
+  return res.json({
+    success: response ? true : false,
+    createdTrip: response ? response : "Cannot create new trip",
   });
+});
+
+const getTrips = asyncHandler(async (req, res) => {
+  const response = await Trip.find(req.body);
+  return res.json({
+    success: response ? true : false,
+    tourTrips: response ? response : "Cannot get trip",
+  });
+});
+
+const updateTrip = asyncHandler(async (req, res) => {
+  const { trid } = req.params;
+  const response = await Trip.findByIdAndUpdate(trid, req.body, {
+    new: true,
+  });
+  return res.json({
+    success: response ? true : false,
+    updatedTrip: response ? response : "Cannot update trip",
+  });
+});
+
+const deleteTrip = asyncHandler(async (req, res) => {
+  const { trid } = req.params;
+  const response = await Trip.findByIdAndDelete(trid);
+  return res.json({
+    success: response ? true : false,
+    deleteTrip: response ? response : "Cannot delete trip",
+  });
+});
 
 module.exports = {
-    createTrip
-}
+  createTrip,
+  getTrips,
+  updateTrip,
+  deleteTrip,
+};

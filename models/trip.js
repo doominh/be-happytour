@@ -16,10 +16,9 @@ var tripSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  license_plate: {
+  licensePlate: {
     type: String,
     required: true,
-    unique: true,
   },
 });
 
