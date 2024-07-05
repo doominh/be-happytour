@@ -20,10 +20,10 @@ function calculateTotalPrice(adult, children, infant, tourPrice) {
   return Math.round(totalPrice / 1000) * 1000;
 }
 const createBooking = asyncHandler(async (req, res) => {
-  const { tid, trid, adult, children, infant } = req.body;
-  if (!tid || !adult) throw new Error("Missing inputs");
+  const { tourId, tripId, adult, children, infant } = req.body;
+  if (!tourId || !adult) throw new Error("Missing inputs");
   const { _id } = req.user;
-  const tour = await Tour.findById(tid);
+  const tour = await Tour.findById(tourId);
   const tourPrice = tour?.price;
   // Gán giá trị mặc định nếu không có trong yêu cầu
   const validChildren = children !== undefined ? children : 0;
@@ -39,8 +39,8 @@ const createBooking = asyncHandler(async (req, res) => {
 
   // Tạo đối tượng đặt chỗ mới
   const booking = new Booking({
-    tour: tid,
-    trip: trid,
+    tour: tourId,
+    trip: tripId,
     adult,
     children: validChildren,
     infant: validInfant,
@@ -54,7 +54,7 @@ const createBooking = asyncHandler(async (req, res) => {
   // Cập nhật bảng Tour, User và Trip với booking mới
   await tour.updateOne({ $push: { booking: booking._id } });
   await User.findByIdAndUpdate(_id, { $push: { booking: booking._id } });
-  await Trip.findByIdAndUpdate(trid, { $push: { booking: booking._id } });
+  await Trip.findByIdAndUpdate(tripId, { $push: { booking: booking._id } });
 
   return res.status(200).json({
     success: booking ? true : false,

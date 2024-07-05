@@ -22,6 +22,12 @@ var tourSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    startDate: {
+      type: Date,
+    },
+    endDate: {
+      type: Date,
+    },
     images: {
       type: Array,
     },

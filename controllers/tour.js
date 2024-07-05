@@ -1,4 +1,7 @@
 const Tour = require("../models/tour");
+const Booking = require("../models/booking");
+const Trip = require("../models/trip");
+const Destination = require("../models/destination");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 
@@ -89,6 +92,9 @@ const updateTour = asyncHandler(async (req, res) => {
 
 const deleteTour = asyncHandler(async (req, res) => {
   const { tid } = req.params;
+  await Booking.updateMany({ tour: tid }, { tour: null });
+  await Trip.updateMany({ tour: tid }, { tour: null });
+  await Destination.updateMany({ tour: tid }, { tour: null });
   const deletedTour = await Tour.findByIdAndDelete(tid);
   return res.status(200).json({
     success: deletedTour ? true : false,

@@ -36,7 +36,6 @@ var userSchema = new mongoose.Schema({
       ref: "Booking",
     }
   ],
-  comment: [{type: mongoose.Types.ObjectId, ref: 'Address'}],
   isBlocked: {
     type: Boolean,
     default: false,

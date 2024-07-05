@@ -1,12 +1,13 @@
 const Trip = require("../models/trip");
 const Tour = require("../models/tour");
+const Booking = require("../models/booking");
 const asyncHandler = require("express-async-handler");
 
 const createTrip = asyncHandler(async (req, res) => {
   const { tid, vehicel, licensePlate } = req.body;
   if (!tid || !vehicel || !licensePlate) throw new Error("Missing inputs");
   // check trùng licensePlate
-  const existingTrip = await Trip.findOne({licensePlate});
+  const existingTrip = await Trip.findOne({ licensePlate });
   if (existingTrip) throw new Error("This trip already exists");
 
   // Tạo trip mới nếu không trùng
@@ -19,10 +20,10 @@ const createTrip = asyncHandler(async (req, res) => {
 });
 
 const getTrips = asyncHandler(async (req, res) => {
-  const response = await Trip.find(req.body);
+  const response = await Trip.find();
   return res.json({
     success: response ? true : false,
-    tourTrips: response ? response : "Cannot get trip",
+    trips: response ? response : "Cannot get trip",
   });
 });
 
@@ -39,6 +40,8 @@ const updateTrip = asyncHandler(async (req, res) => {
 
 const deleteTrip = asyncHandler(async (req, res) => {
   const { trid } = req.params;
+  await Booking.updateMany({ trip: trid }, { trip: null });
+  await Tour.updateMany({ trip: trid }, { $pull: { trip: trid } });
   const response = await Trip.findByIdAndDelete(trid);
   return res.json({
     success: response ? true : false,
