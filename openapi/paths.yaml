@@ -1,0 +1,738 @@
+tags:
+  - name: Auth
+  - name: User
+    description: Các API liên quan đến user
+  - name: Tour
+    description: Các API liên quan đến tour
+  - name: Tour-category
+    description: Các API liên quan đến category
+  - name: Booking
+    description: Các API liên quan đến booking
+  - name: Trip
+    description: Các API liên quan đến trip
+  - name: Destination
+    description: Các API liên quan đến destination
+paths:
+  # Auth API
+  /api/user/register:
+    post:
+      tags:
+        - Auth
+      summary: Đăng ký
+      description: Đăng ký người dùng mới
+      operationId: register
+      requestBody:
+        description: Thông tin đăng ký
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+  /api/user/login:
+    post:
+      tags:
+        - Auth
+      summary: Đăng nhập
+      description: Đăng nhập vào hệ thống
+      operationId: login
+      requestBody:
+        description: Thông tin đăng nhập
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+        required: true
+      responses:
+        "200":
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessAuthentication"
+        "500":
+          description: Đăng nhập thất bại
+  /api/user/refreshtoken:
+    post:
+      tags:
+        - Auth
+      summary: Refresh token
+      description: Refresh token
+      operationId: refreshToken
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Refresh token cho user
+      responses:
+        "200":
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              content:
+                application/json:
+                  example: {}
+  /api/user/logout:
+    post:
+      tags:
+        - Auth
+      summary: Đăng xuất
+      description: Đăng xuất khỏi hệ thống
+      operationId: logout
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/user/forgotpassword:
+    get:
+      tags:
+        - Auth
+      summary: Quên mật khẩu
+      description: Quên mật khẩu
+      operationId: forgotpassword
+      parameters:
+        - name: email
+          in: query
+          description: email của user
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/user/resetpassword:
+    put:
+      tags:
+        - Auth
+      summary: Reset mật khẩu
+      description: Reset mật khẩu
+      operationId: resetpassword
+      requestBody:
+        description: Thông tin reset
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPassword"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  # User API
+  /api/user/current:
+    get:
+      tags:
+        - User
+      summary: Lấy thông tin user
+      description: Lấy thông tin user
+      operationId: getCurrent
+      security:
+        - BearerAuth: []
+      responses:
+        default:
+          description: Lấy thông tin user thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    put:
+      tags:
+        - User
+      summary: Cập nhật user
+      description: Cập nhật user
+      operationId: updateUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin cập nhật
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/user/{id}:
+    put:
+      tags:
+        - User
+      summary: Cập nhật thông tin người dùng với Admin
+      description: Cập nhật thông tin người dùng với Admin
+      operationId: updateUserByAdmin
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của user cần cập nhật
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Thông tin cập nhật
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/user:
+    get:
+      tags:
+        - User
+      summary: Lấy thông tin các user
+      description: Lấy thông tin các user
+      operationId: getUsers
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Lấy thông tin các user thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    delete:
+      tags:
+        - User
+      summary: Xóa người dùng
+      description: Xóa người dùng
+      operationId: deleteUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: _id
+          in: query
+          description: ID của người dùng để xóa
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+
+  # Tour
+  /api/tour:
+    post:
+      tags:
+        - Tour
+      summary: Tạo tour du lịch mới
+      description: Tạo tour du lịch mới
+      operationId: createNewTour
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin tạo tour
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Tour"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+    get:
+      tags:
+        - Tour
+      summary: Lấy thông tin toàn bộ tour
+      description: Lấy thông tin toàn bộ tour
+      operationId: getTours
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+  /api/tour/{id}:
+    get:
+      tags:
+        - Tour
+      summary: Lấy thông tin tour
+      description: Lấy thông tin tour
+      operationId: getTour
+      parameters:
+        - name: id
+          in: path
+          description: ID của tour cần lấy dữ liệu
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+    put:
+      tags:
+        - Tour
+      summary: Cập nhật tour
+      description: Cập nhật tour với Admin
+      operationId: updateTour
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của tour cần cập nhật
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Thông tin cập nhật
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Tour"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+    delete:
+      tags:
+        - Tour
+      summary: Xóa tour du lịch
+      description: Xóa tour du lịch
+      operationId: deleteTour
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của tour cần xóa
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+  /api/tour/ratings:
+    put:
+      tags:
+        - Tour
+      summary: Tạo hoặc cập nhật ratings cho tour
+      description: Tạo hoặc cập nhật ratings cho tour
+      operationId: ratings
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin tạo hoặc cập nhật ratings
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ratings"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+  /api/tour/uploadimage/{id}:
+    put:
+      tags:
+        - Tour
+      summary: Upload ảnh cho tour
+      description: Upload ảnh cho tour
+      operationId: uploadImage
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của tour cần upload ảnh
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Upload file ảnh
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                images:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+
+  # Tour category
+  /api/tour-category:
+    post:
+      tags:
+        - Tour-category
+      summary: Tạo category mới
+      description: Tạo category mới
+      operationId: createCategory
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin tạo category
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+    get:
+      tags:
+        - Tour-category
+      summary: Lấy thông tin các category
+      description: Lấy thông tin các category
+      operationId: getCategories
+      security:
+        - BearerAuth: []
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/tour-category/{id}:
+    put:
+      tags:
+        - Tour-category
+      summary: Cập nhật category
+      description: Cập nhật category
+      operationId: updateCategory
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của category cần cập nhật
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Thông tin cập nhật
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+    delete:
+      tags:
+        - Tour-category
+      summary: Xóa category
+      description: Xóa category
+      operationId: deleteCategory
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của category cần xóa
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+
+  # Booking
+  /api/booking:
+    post:
+      tags:
+        - Booking
+      summary: Tạo đơn booking mới
+      description: Tạo đơn booking mới
+      operationId: createNewBooking
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin tạo đơn booking
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tourId:
+                  type: string
+                  example: "667806015ea09d1970fd4fa6"
+                tripId:
+                  type: string
+                  example: "668c03c684c8d40db8abb9d3"
+                adult:
+                  type: integer
+                  example: 3
+                children:
+                  type: integer
+                  example: 0
+                infant:
+                  type: integer
+                  example: 0
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+    get:
+      tags:
+        - Booking
+      summary: Lấy danh sách tất cả booking
+      description: Lấy danh sách tất cả booking
+      operationId: getBookings
+      security:
+        - BearerAuth: []
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/booking/current:
+    get:
+      tags:
+        - Booking
+      summary: Lấy danh sách booking của user
+      description: Lấy danh sách booking của user
+      operationId: getUserBooking
+      security:
+        - BearerAuth: []
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/booking/status/{id}:
+    put:
+      tags:
+        - Booking
+      summary: Update status
+      description: Update status
+      operationId: updateStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của booking cần cập nhật status
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Thông tin cập nhật
+        content:
+          application/json:
+            schema:
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - Cancelled
+                    - Processing
+                    - Success
+                  example: "Processing"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+
+  # Trip
+  /api/trip:
+    post:
+      tags:
+        - Trip
+      summary: Tạo chuyến đi mới
+      description: Tạo chuyến đi mới
+      operationId: createNewTrip
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin tạo trip
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Trip"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+    get:
+      tags:
+        - Trip
+      summary: Lấy thông tin tất cả chuyến đi
+      description: Lấy thông tin tất cả chuyến đi
+      operationId: getTrips
+      security:
+        - BearerAuth: []
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/trip/{id}:
+    put:
+      tags:
+        - Trip
+      summary: Cập nhật chuyến đi
+      description: Cập nhật chuyến đi
+      operationId: updateTrip
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của chuyến đi cần cập nhật
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Thông tin cập nhật
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Trip"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+    delete:
+      tags:
+        - Trip
+      summary: Xóa chuyến đi
+      description: Xóa chuyến đi
+      operationId: deleteTrip
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của category cần xóa
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+
+  # Trip
+  /api/destination:
+    post:
+      tags:
+        - Destination
+      summary: Tạo điểm đến mới
+      description: Tạo điểm đến mới
+      operationId: createDestination
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin tạo điểm đến
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Destination"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+    get:
+      tags:
+        - Destination
+      summary: Lấy thông tin tất cả điểm đến
+      description: Lấy thông tin tất cả điểm đến
+      operationId: getDestinations
+      security:
+        - BearerAuth: []
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/destination/{id}:
+    put:
+      tags:
+        - Destination
+      summary: Cập nhật điểm đến
+      description: Cập nhật điểm đến
+      operationId: updateDestination
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của điểm đến cần cập nhật
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Thông tin cập nhật
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Destination"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+    delete:
+      tags:
+        - Destination
+      summary: Xóa điểm đến
+      description: Xóa điểm đến
+      operationId: deleteDestination
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của destination cần xóa
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}

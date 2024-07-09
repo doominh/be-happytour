@@ -1,0 +1,262 @@
+components:
+  schemas:
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: doominh20y@gmail.com
+        password:
+          type: string
+          example: "123123"
+    RegisterBody:
+      type: object
+      properties:
+        firstname:
+          type: string
+          example: "Admin"
+        lastname:
+          type: string
+          example: "I'am"
+        email:
+          type: string
+          example: "admin123@gmail.com"
+        password:
+          type: string
+          example: "123456"
+        mobile:
+          type: string
+          example: "0998877665"
+        role:
+          type: string
+          enum:
+            - user
+            - admin
+          example: "admin"
+    ResetPassword:
+      type: object
+      properties:
+        password:
+          type: string
+          example: "123123"
+        token:
+          type: string
+          example: "8c9c85cfd5269e912c76e2f2c9947732e479a646b35ec17bab5ae0e435c80705"
+    SuccessAuthentication:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        accessToken:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjcxZGUyZjQ4NzJhZDU3NzE0ZTZhMGUiLCJyb2xlIjoidXNlciIsImlhdCI6MTcyMDI5NTAyMSwiZXhwIjoxNzIwNDY3ODIxfQ.i7oU8tkRh2Q8HPnVP8DzUtGzTs1MJkL0iJ5Tj8v2JoU"
+        userData:
+          type: object
+          example: {}
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: MongoId
+          example: "6671de2f4872ad57714e6a0e"
+        firstname:
+          type: string
+          example: "minh"
+        lastname:
+          type: string
+          example: "do"
+        email:
+          type: string
+          example: "admin@gmail.com"
+        mobile:
+          type: string
+          example: "0918983960"
+        booking:
+          type: array
+          items:
+            type: object
+          example: []
+        comment:
+          type: array
+          items:
+            type: object
+          example: []
+        isBlocked:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: ISO8601
+          example: 2024-06-18T19:21:19.282Z
+        updatedAt:
+          type: string
+          format: ISO8601
+          example: 2024-07-07T13:06:26.518Z
+        __v:
+          type: integer
+          example: 0
+    Tour:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: ObjectId
+          example: "668bc56dfe70b3c8cfa192e1"
+        name:
+          type: string
+          example: "Tour du lịch mới"
+        slug:
+          type: string
+          example: "tour-du-lich-moi"
+        description:
+          type: string
+          example: "Tour du lịch mới..."
+        price:
+          type: integer
+          example: 2000000
+        images:
+          type: array
+          items:
+            type: string
+          example: []
+        totalRatings:
+          type: integer
+          example: 0
+        category:
+          type: string
+          format: ObjectId
+          example: "667ebb65869a4e0d1b8f29ea"
+        trip:
+          type: array
+          items:
+            type: string
+          example: []
+        booking:
+          type: array
+          items:
+            type: string
+          example: []
+        destination:
+          type: array
+          items:
+            type: string
+          example: []
+        ratings:
+          type: array
+          items:
+            type: string
+          example: []
+        createdAt:
+          type: string
+          format: date
+          example: 2024-07-08T10:54:37.862Z
+        updatedAt:
+          type: string
+          format: date
+          example: 2024-07-08T10:54:37.862Z
+        __v:
+          type: integer
+          example: 0
+    Category:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Category mới"
+    Booking:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: ObjectId
+          example: "66869c39462e472372cdd1cc"
+        tour:
+          type: string
+          format: ObjectId
+          example: "66869c39462e472372cdd1cc"
+        trip:
+          type: string
+          format: ObjectId
+          example: "66869c39462e472372cdd1cc"
+        status:
+          type: string
+          example: "Processing"
+        orderBy:
+          type: string
+          format: ObjectId
+          example: "6674412919972bb23a5e9582"
+        adult:
+          type: integer
+          example: 3
+        children:
+          type: integer
+          example: 1
+        infant:
+          type: integer
+          example: 1
+        total:
+          type: integer
+          example: 18750000
+        createdAt:
+          type: string
+          format: date
+          example: 2024-07-04T12:57:29.461Z
+        updatedAt:
+          type: string
+          format: date
+          example: 2024-07-05T17:40:15.932Z
+        __v:
+          type: integer
+          example: 0
+    Trip: 
+      type: object
+      properties:
+        tourId:
+          type: string
+          format: ObjectId
+          example: "667806015ea09d1970fd4fa6"
+        vehicel:
+          type: string
+          example: "Xe khách"
+        licensePlate: 
+          type: string
+          example: "59A-112233"
+    Destination: 
+      type: object
+      properties:
+        tourId:
+          type: string  
+          format: ObjectId
+          example: "667801b6169b2174ba705e4f"
+        name:
+          type: string
+          example: "điểm đến thứ nhất"
+        description:
+          type: string
+          example: "Mô tả ......"
+        hotel:
+          type: string
+          example: "Khách sạn ABC"
+        address: 
+          type: string
+          example: "113 Nguyễn Oanh..."
+    Ratings:
+      type: object
+      properties:
+        star:
+          type: integer
+          example: 5
+        comment:
+          type: string
+          example: "tour chất lượng"
+        tid:
+          type: string
+          format: ObjectId
+          example: "667ae06b7972283ba7879dae"
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

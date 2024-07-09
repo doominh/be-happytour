@@ -4,15 +4,15 @@ const Booking = require("../models/booking");
 const asyncHandler = require("express-async-handler");
 
 const createTrip = asyncHandler(async (req, res) => {
-  const { tid, vehicel, licensePlate } = req.body;
-  if (!tid || !vehicel || !licensePlate) throw new Error("Missing inputs");
+  const { tourId, vehicel, licensePlate } = req.body;
+  if (!tourId || !vehicel || !licensePlate) throw new Error("Missing inputs");
   // check trùng licensePlate
   const existingTrip = await Trip.findOne({ licensePlate });
   if (existingTrip) throw new Error("This trip already exists");
 
   // Tạo trip mới nếu không trùng
-  const response = await Trip.create({ tour: tid, vehicel, licensePlate });
-  await Tour.findByIdAndUpdate(tid, { $push: { trip: response._id } });
+  const response = await Trip.create({ tour: tourId, vehicel, licensePlate });
+  await Tour.findByIdAndUpdate(tourId, { $push: { trip: response._id } });
   return res.json({
     success: response ? true : false,
     createdTrip: response ? response : "Cannot create new trip",

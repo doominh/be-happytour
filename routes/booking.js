@@ -4,7 +4,7 @@ const { verifyAccessToken, isAdmin } = require("../middlewares/verifyToken");
 
 router.post("/", verifyAccessToken, ctrls.createBooking);
 router.get("/", [verifyAccessToken, isAdmin], ctrls.getBookings);
-router.get("/", verifyAccessToken, ctrls.getUserBooking);
+router.get("/current", verifyAccessToken, ctrls.getUserBooking);
 
 router.put("/status/:bid", [verifyAccessToken, isAdmin], ctrls.updateStatus);
 
