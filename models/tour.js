@@ -22,6 +22,10 @@ var tourSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    sold: {
+      type: Number,
+      default: 0
+    },
     startDate: {
       type: Date,
     },

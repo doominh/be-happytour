@@ -52,7 +52,7 @@ const createBooking = asyncHandler(async (req, res) => {
   await booking.save();
 
   // Cập nhật bảng Tour, User và Trip với booking mới
-  await tour.updateOne({ $push: { booking: booking._id } });
+  await tour.updateOne({ $push: { booking: booking._id }, $inc: { sold: 1 } });
   await User.findByIdAndUpdate(_id, { $push: { booking: booking._id } });
   await Trip.findByIdAndUpdate(tripId, { $push: { booking: booking._id } });
 
@@ -79,7 +79,9 @@ const updateStatus = asyncHandler(async (req, res) => {
 
 const getUserBooking = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const response = await Booking.find({ orderBy: _id }).populate('tour', 'name price').populate('trip', 'vehicel licensePlate');
+  const response = await Booking.find({ orderBy: _id })
+    .populate("tour", "name price")
+    .populate("trip", "vehicel licensePlate");
   res.status(200).json({
     success: response ? true : false,
     bookingData: response ? response : "Cannot get user's booking list",
@@ -103,7 +105,9 @@ const getBookings = asyncHandler(async (req, res) => {
   // // Filtering
   // if (queries?.name)
   //   formatedQueries.name = { $regex: queries.name, $options: "i" };
-  let queryCommand = Booking.find(formatedQueries).populate('tour', 'name price').populate('trip', 'vehicel licensePlate');
+  let queryCommand = Booking.find(formatedQueries)
+    .populate("tour", "name price")
+    .populate("trip", "vehicel licensePlate");
 
   // Sorting
   if (req.query.sort) {
