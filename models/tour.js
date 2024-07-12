@@ -22,6 +22,9 @@ var tourSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    thumb: {
+      type: String,
+    },
     sold: {
       type: Number,
       default: 0
