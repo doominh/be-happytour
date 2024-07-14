@@ -27,6 +27,7 @@
     "slugify": "^1.6.6",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "uniqid": "^5.4.0",
     "yaml": "^2.4.5"
   },
   "devDependencies": {

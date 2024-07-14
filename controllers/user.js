@@ -7,10 +7,32 @@ const {
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const crypto = require("crypto");
+const makeToken = require("uniqid");
+
+// const register = asyncHandler(async (req, res) => {
+//   const { email, password, firstname, lastname } = req.body;
+//   if (!email || !password || !firstname || !lastname)
+//     return res.status(400).json({
+//       success: false,
+//       mes: "Missing inputs",
+//     });
+
+//   const user = await User.findOne({ email });
+//   if (user) throw new Error("User has existed!");
+//   else {
+//     const newUser = await User.create(req.body);
+//     return res.status(200).json({
+//       success: newUser ? true : false,
+//       mes: newUser
+//         ? "Register is successfully. Please go to login"
+//         : "Something went wrong",
+//     });
+//   }
+// });
 
 const register = asyncHandler(async (req, res) => {
-  const { email, password, firstname, lastname } = req.body;
-  if (!email || !password || !firstname || !lastname)
+  const { email, password, firstname, lastname, mobile } = req.body;
+  if (!email || !password || !firstname || !lastname || !mobile)
     return res.status(400).json({
       success: false,
       mes: "Missing inputs",
@@ -19,14 +41,42 @@ const register = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
   if (user) throw new Error("User has existed!");
   else {
-    const newUser = await User.create(req.body);
-    return res.status(200).json({
-      success: newUser ? true : false,
-      mes: newUser
-        ? "Register is successfully. Please go to login"
-        : "Something went wrong",
+    const token = makeToken();
+    res.cookie(
+      "dataregister",
+      { ...req.body, token },
+      {
+        httpOnly: true,
+        maxAge: 15 * 60 * 1000,
+      }
+    );
+    const html = `Please click on the link below to complete the registration process. This link will expire 15 minutes from now. <a href=${process.env.URL_SERVER}/api/user/finalregister/${token} >Click here</a>`;
+    await sendMail({
+      email,
+      html,
+      subject: "Complete registration Happy Tour",
+    });
+    return res.json({
+      success: true,
+      mes: "Please check your email to active account",
     });
   }
+});
+const finalRegister = asyncHandler(async (req, res) => {
+  const cookie = req.cookies;
+  const { token } = req.params;
+  if (!cookie || cookie?.dataregister?.token !== token)
+    return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`);
+  const newUser = await User.create({
+    email: cookie?.dataregister?.email,
+    password: cookie?.dataregister?.password,
+    mobile: cookie?.dataregister?.mobile,
+    firstname: cookie?.dataregister?.firstname,
+    lastname: cookie?.dataregister?.lastname,
+  });
+  if (newUser)
+    return res.redirect(`${process.env.CLIENT_URL}/finalregister/success`);
+  else return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`);
 });
 
 // Refresh token => Cấp mới access token
@@ -70,8 +120,7 @@ const login = asyncHandler(async (req, res) => {
 
 const getCurrent = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const user = await User.findById(_id)
-    .select("-refreshToken -password -role")
+  const user = await User.findById(_id).select("-refreshToken -password -role");
   return res.status(200).json({
     success: user ? true : false,
     rs: user ? user : "User not found",
@@ -139,6 +188,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const data = {
     email,
     html,
+    subject: "Forgot password",
   };
   const rs = await sendMail(data);
   return res.status(200).json({
@@ -227,4 +277,5 @@ module.exports = {
   deleteUser,
   updateUser,
   updateUserByAdmin,
+  finalRegister,
 };

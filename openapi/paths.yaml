@@ -257,8 +257,6 @@ paths:
       summary: Lấy thông tin toàn bộ tour
       description: Lấy thông tin toàn bộ tour
       operationId: getTours
-      security:
-        - BearerAuth: []
       responses:
         "200":
           content:
@@ -412,8 +410,6 @@ paths:
       summary: Lấy thông tin các category
       description: Lấy thông tin các category
       operationId: getCategories
-      security:
-        - BearerAuth: []
       responses:
         default:
           content:
@@ -681,8 +677,6 @@ paths:
       summary: Lấy thông tin tất cả điểm đến
       description: Lấy thông tin tất cả điểm đến
       operationId: getDestinations
-      security:
-        - BearerAuth: []
       responses:
         default:
           content:
