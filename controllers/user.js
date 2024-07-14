@@ -48,6 +48,8 @@ const register = asyncHandler(async (req, res) => {
       {
         httpOnly: true,
         maxAge: 15 * 60 * 1000,
+        secure: true, // Đảm bảo cookie chỉ được gửi qua HTTPS
+        sameSite: 'None' // Cho phép cookie được gửi cùng với các yêu cầu cross-site
       }
     );
     const html = `Please click on the link below to complete the registration process. This link will expire 15 minutes from now. <a href=${process.env.URL_SERVER}/api/user/finalregister/${token} >Click here</a>`;
