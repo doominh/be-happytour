@@ -14,7 +14,7 @@ const sendMail = asyncHandler(async ({ email, html, subject }) => {
 
   // send mail with defined transport object
   const info = await transporter.sendMail({
-    from: '"Happy Tour 😄" <no-reply@happytour.com>', // sender address
+    from: '"Happy Tour 🚌✈️🌍" <no-reply@happytour.com>', // sender address
     to: email, // list of receivers
     subject: subject, // Subject line
     html: html, // html body

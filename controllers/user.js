@@ -30,6 +30,41 @@ const makeToken = require("uniqid");
 //   }
 // });
 
+// const register = asyncHandler(async (req, res) => {
+//   const { email, password, firstname, lastname, mobile } = req.body;
+//   if (!email || !password || !firstname || !lastname || !mobile)
+//     return res.status(400).json({
+//       success: false,
+//       mes: "Missing inputs",
+//     });
+
+//   const user = await User.findOne({ email });
+//   if (user) throw new Error("User has existed!");
+//   else {
+//     const token = makeToken();
+//     res.cookie(
+//       "dataregister",
+//       { ...req.body, token },
+//       {
+//         httpOnly: true,
+//         maxAge: 15 * 60 * 1000,
+//         secure: true, // Đảm bảo cookie chỉ được gửi qua HTTPS
+//         sameSite: "None", // Cho phép cookie được gửi cùng với các yêu cầu cross-site
+//       }
+//     );
+//     const html = `Please click on the link below to complete the registration process. This link will expire 15 minutes from now. <a href=${process.env.URL_SERVER}/api/user/finalregister/${token} >Click here</a>`;
+//     await sendMail({
+//       email,
+//       html,
+//       subject: "Complete registration Happy Tour",
+//     });
+//     return res.json({
+//       success: true,
+//       mes: "Please check your email to active account",
+//     });
+//   }
+// });
+
 const register = asyncHandler(async (req, res) => {
   const { email, password, firstname, lastname, mobile } = req.body;
   if (!email || !password || !firstname || !lastname || !mobile)
@@ -42,43 +77,83 @@ const register = asyncHandler(async (req, res) => {
   if (user) throw new Error("User has existed!");
   else {
     const token = makeToken();
-    res.cookie(
-      "dataregister",
-      { ...req.body, token },
-      {
-        httpOnly: true,
-        maxAge: 15 * 60 * 1000,
-        secure: true, // Đảm bảo cookie chỉ được gửi qua HTTPS
-        sameSite: 'None' // Cho phép cookie được gửi cùng với các yêu cầu cross-site
-      }
-    );
-    const html = `Please click on the link below to complete the registration process. This link will expire 15 minutes from now. <a href=${process.env.URL_SERVER}/api/user/finalregister/${token} >Click here</a>`;
-    await sendMail({
-      email,
-      html,
-      subject: "Complete registration Happy Tour",
+    const emailEdited = btoa(email) + "@" + token;
+    const newUser = await User.create({
+      email: emailEdited,
+      password,
+      firstname,
+      lastname,
+      mobile,
     });
+    if (newUser) {
+      const html = `<h2>Register code:</h2><br /><blockquote>${token}</blockquote>`;
+      await sendMail({
+        email,
+        html,
+        subject: "Confirm register account Happy Tour",
+      });
+    }
+    setTimeout(async() => {
+      await User.deleteOne({email: emailEdited})
+    },[300000])
     return res.json({
-      success: true,
-      mes: "Please check your email to active account",
+      success: newUser ? true : false,
+      mes: newUser
+        ? "Please check your email to active account"
+        : "Something went wrong, please try later",
     });
   }
 });
+
+// const finalRegister = asyncHandler(async (req, res) => {
+//   const cookie = req.cookies;
+//   const { token } = req.params;
+//   if (!cookie || cookie?.dataregister?.token !== token) {
+//     res.clearCookie("dataregister");
+//     return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`);
+//   }
+//   const newUser = await User.create({
+//     email: cookie?.dataregister?.email,
+//     password: cookie?.dataregister?.password,
+//     mobile: cookie?.dataregister?.mobile,
+//     firstname: cookie?.dataregister?.firstname,
+//     lastname: cookie?.dataregister?.lastname,
+//   });
+//   res.clearCookie("dataregister");
+//   if (newUser)
+//     return res.redirect(`${process.env.CLIENT_URL}/finalregister/success`);
+//   else return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`);
+// });
+
 const finalRegister = asyncHandler(async (req, res) => {
-  const cookie = req.cookies;
+  // const cookie = req.cookies;
   const { token } = req.params;
-  if (!cookie || cookie?.dataregister?.token !== token)
-    return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`);
-  const newUser = await User.create({
-    email: cookie?.dataregister?.email,
-    password: cookie?.dataregister?.password,
-    mobile: cookie?.dataregister?.mobile,
-    firstname: cookie?.dataregister?.firstname,
-    lastname: cookie?.dataregister?.lastname,
+  const notActiveEmail = await User.findOne({ email: new RegExp(`${token}$`) });
+  if (notActiveEmail) {
+    notActiveEmail.email = atob(notActiveEmail?.email?.split("@")[0]);
+    notActiveEmail.save();
+  }
+  return res.json({
+    success: notActiveEmail ? true : false,
+    response: notActiveEmail
+      ? 'Register is succesfully. Please go to login.'
+      : "Something went wrong, please try later.",
   });
-  if (newUser)
-    return res.redirect(`${process.env.CLIENT_URL}/finalregister/success`);
-  else return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`);
+  // if (!cookie || cookie?.dataregister?.token !== token) {
+  //   res.clearCookie("dataregister");
+  //   return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`);
+  // }
+  // const newUser = await User.create({
+  //   email: cookie?.dataregister?.email,
+  //   password: cookie?.dataregister?.password,
+  //   mobile: cookie?.dataregister?.mobile,
+  //   firstname: cookie?.dataregister?.firstname,
+  //   lastname: cookie?.dataregister?.lastname,
+  // });
+  // res.clearCookie("dataregister");
+  // if (newUser)
+  //   return res.redirect(`${process.env.CLIENT_URL}/finalregister/success`);
+  // else return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`);
 });
 
 // Refresh token => Cấp mới access token
@@ -178,14 +253,14 @@ const logout = asyncHandler(async (req, res) => {
 // Server check token có giống với token mà server đã gửi email hay không
 // Change password
 const forgotPassword = asyncHandler(async (req, res) => {
-  const { email } = req.query;
+  const { email } = req.body;
   if (!email) throw Error("Missing email");
   const user = await User.findOne({ email });
   if (!user) throw new Error("User not found");
   const resetToken = user.createPasswordChangedToken();
   await user.save();
 
-  const html = `Please click on the link below to change your password. This link will expire 15 minutes from now. <a href=${process.env.URL_SERVER}/api/user/reset-password/${resetToken} >Click here</a>`;
+  const html = `Please click on the link below to change your password. This link will expire 15 minutes from now. <a href=${process.env.CLIENT_URL}/reset-password/${resetToken} >Click here</a>`;
 
   const data = {
     email,
@@ -194,8 +269,10 @@ const forgotPassword = asyncHandler(async (req, res) => {
   };
   const rs = await sendMail(data);
   return res.status(200).json({
-    success: true,
-    rs,
+    success: rs.response?.includes("OK") ? true : false,
+    mes: rs.response?.includes("OK")
+      ? "Please check your email."
+      : "There were some errors.",
   });
 });
 
