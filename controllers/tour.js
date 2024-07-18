@@ -17,7 +17,10 @@ const createTour = asyncHandler(async (req, res) => {
 
 const getTour = asyncHandler(async (req, res) => {
   const { tid } = req.params;
-  const tour = await Tour.findById(tid);
+  const tour = await Tour.findById(tid)
+    .populate("trip", "vehicel licensePlate")
+    .populate("destination", "name description hotel address")
+    .select("-booking");
   return res.status(200).json({
     success: tour ? true : false,
     tourData: tour ? tour : "Cannot get tour",
@@ -63,6 +66,10 @@ const getTours = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   queryCommand.skip(skip).limit(limit);
 
+  // // Populate trip and destination fields
+  // queryCommand = queryCommand
+  //   .populate("trip", "vehicle licensePlate")
+  //   .populate("destination", "name description hotel address")
   // Execute query
   // Số lượng sp thỏa mãn điều kiện !== số lượng sp trả về 1 lần gọi API
   try {
