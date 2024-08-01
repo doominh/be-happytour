@@ -51,7 +51,7 @@ var tourSchema = new mongoose.Schema(
     },
     category: {
       type: mongoose.Types.ObjectId,
-      ref: "Category",
+      ref: "TourCategory",
     },
     trip: [
       {
@@ -71,6 +71,9 @@ var tourSchema = new mongoose.Schema(
         ref: "Destination",
       },
     ],
+    tourType: {
+      type: String,
+    },
   },
   {
     timestamps: true,

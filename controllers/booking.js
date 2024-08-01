@@ -107,8 +107,8 @@ const getBookings = asyncHandler(async (req, res) => {
   //   formatedQueries.name = { $regex: queries.name, $options: "i" };
   let queryCommand = Booking.find(formatedQueries)
     .populate("tour", "name price")
-    .populate("trip", "vehicel licensePlate");
-
+    .populate("trip", "vehicel licensePlate")
+    .populate("orderBy", "firstname lastname mobile");
   // Sorting
   if (req.query.sort) {
     const sortBy = req.query.sort.split(",").join(" ");

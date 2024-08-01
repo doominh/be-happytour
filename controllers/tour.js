@@ -2,6 +2,7 @@ const Tour = require("../models/tour");
 const Booking = require("../models/booking");
 const Trip = require("../models/trip");
 const Destination = require("../models/destination");
+const TourCategory = require("../models/tourCategory");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 
@@ -20,6 +21,7 @@ const getTour = asyncHandler(async (req, res) => {
   const tour = await Tour.findById(tid)
     .populate("trip", "vehicel licensePlate")
     .populate("destination", "name description hotel address")
+    .populate("category", "name")
     .select("-booking");
   return res.status(200).json({
     success: tour ? true : false,
@@ -42,10 +44,26 @@ const getTours = asyncHandler(async (req, res) => {
   );
   const formatedQueries = JSON.parse(queryString);
 
+  let tourTypeQueryObject = {};
   // Filtering
   if (queries?.name)
     formatedQueries.name = { $regex: queries.name, $options: "i" };
-  let queryCommand = Tour.find(formatedQueries);
+  if (queries?.category) {
+    const category = await TourCategory.findOne({
+      name: { $regex: queries.category, $options: "i" },
+    }).select("_id");
+    if (category) formatedQueries.category = category._id;
+  }
+  if (queries?.tourType) {
+    delete formatedQueries.tourType;
+    const tourTypeArr = queries.tourType?.split(",");
+    const tourTypeQuery = tourTypeArr.map((el) => ({
+      tourType: { $regex: el, $options: "i" },
+    }));
+    tourTypeQueryObject = { $or: tourTypeQuery };
+  }
+  const allFormatedQueries = { ...tourTypeQueryObject, ...formatedQueries };
+  let queryCommand = Tour.find(allFormatedQueries);
 
   // Sorting
   if (req.query.sort) {
@@ -66,15 +84,15 @@ const getTours = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   queryCommand.skip(skip).limit(limit);
 
-  // // Populate trip and destination fields
-  // queryCommand = queryCommand
+  // Populate trip and destination fields
+  queryCommand = queryCommand.populate("category", "name");
   //   .populate("trip", "vehicle licensePlate")
   //   .populate("destination", "name description hotel address")
   // Execute query
   // Số lượng sp thỏa mãn điều kiện !== số lượng sp trả về 1 lần gọi API
   try {
     const response = await queryCommand.exec();
-    const counts = await Tour.find(formatedQueries).countDocuments();
+    const counts = await Tour.find(allFormatedQueries).countDocuments();
     return res.status(200).json({
       success: response ? true : false,
       counts,
