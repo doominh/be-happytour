@@ -22,6 +22,10 @@ const getTour = asyncHandler(async (req, res) => {
     .populate("trip", "vehicel licensePlate")
     .populate("destination", "name description hotel address")
     .populate("category", "name")
+    .populate({
+      path: "ratings",
+      populate: { path: "postedBy", select: "firstname lastname avatar" },
+    })
     .select("-booking");
   return res.status(200).json({
     success: tour ? true : false,
@@ -129,7 +133,7 @@ const deleteTour = asyncHandler(async (req, res) => {
 
 const ratings = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { star, comment, tid } = req.body;
+  const { star, comment, tid, updatedAt } = req.body;
   if (!star || !tid) throw new Error("Missing inputs");
   const ratingTour = await Tour.findById(tid);
   const alreadyRating = ratingTour?.ratings?.find(
@@ -145,20 +149,19 @@ const ratings = asyncHandler(async (req, res) => {
         "ratings._id": alreadyRating._id, // Tìm phần tử cụ thể trong mảng ratings
       },
       {
-        $set: { "ratings.$.star": star, "ratings.$.comment": comment },
+        $set: { "ratings.$.star": star, "ratings.$.comment": comment, "ratings.$.updatedAt": updatedAt },
       },
       { new: true }
     );
   } else {
     // Add star & comment
-    const response = await Tour.findByIdAndUpdate(
+    await Tour.findByIdAndUpdate(
       tid,
       {
-        $push: { ratings: { star, comment, postedBy: _id } },
+        $push: { ratings: { star, comment, postedBy: _id, updatedAt } },
       },
       { new: true }
     );
-    console.log(response);
   }
 
   // Sum ratings

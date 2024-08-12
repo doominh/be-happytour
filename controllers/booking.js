@@ -126,6 +126,7 @@ const getBookings = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   queryCommand.skip(skip).limit(limit);
 
+  queryCommand = queryCommand.populate('orderBy', 'firstname lastname');
   try {
     const response = await queryCommand.exec();
     const counts = await Booking.find(formatedQueries).countDocuments();

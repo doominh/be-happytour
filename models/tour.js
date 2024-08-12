@@ -27,7 +27,7 @@ var tourSchema = new mongoose.Schema(
     },
     sold: {
       type: Number,
-      default: 0
+      default: 0,
     },
     startDate: {
       type: Date,
@@ -43,6 +43,7 @@ var tourSchema = new mongoose.Schema(
         star: { type: Number, required: true },
         postedBy: { type: mongoose.Types.ObjectId, ref: "User" },
         comment: { type: String },
+        updatedAt: { type: Date },
       },
     ],
     totalRatings: {
@@ -57,13 +58,13 @@ var tourSchema = new mongoose.Schema(
       {
         type: mongoose.Types.ObjectId,
         ref: "Trip",
-      }
+      },
     ],
     booking: [
       {
         type: mongoose.Types.ObjectId,
         ref: "Booking",
-      }
+      },
     ],
     destination: [
       {
