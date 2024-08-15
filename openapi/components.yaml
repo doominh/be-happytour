@@ -100,65 +100,29 @@ components:
     Tour:
       type: object
       properties:
-        _id:
-          type: string
-          format: ObjectId
-          example: "668bc56dfe70b3c8cfa192e1"
         name:
           type: string
           example: "Tour du lịch mới"
-        slug:
-          type: string
-          example: "tour-du-lich-moi"
         description:
           type: string
           example: "Tour du lịch mới..."
         price:
           type: integer
           example: 2000000
-        images:
-          type: array
-          items:
-            type: string
-          example: []
-        totalRatings:
-          type: integer
-          example: 0
         category:
           type: string
           format: ObjectId
           example: "667ebb65869a4e0d1b8f29ea"
-        trip:
-          type: array
-          items:
-            type: string
-          example: []
-        booking:
-          type: array
-          items:
-            type: string
-          example: []
-        destination:
-          type: array
-          items:
-            type: string
-          example: []
-        ratings:
-          type: array
-          items:
-            type: string
-          example: []
-        createdAt:
+        typeTour:
           type: string
-          format: date
-          example: 2024-07-08T10:54:37.862Z
-        updatedAt:
-          type: string
-          format: date
-          example: 2024-07-08T10:54:37.862Z
-        __v:
-          type: integer
-          example: 0
+          enum:
+            - couple
+            - adventure
+            - cultural
+            - family
+            - luxury
+            - budget
+          example: "couple"
     Category:
       type: object
       properties:
