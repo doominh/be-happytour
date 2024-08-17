@@ -12,6 +12,8 @@ tags:
     description: Các API liên quan đến trip
   - name: Destination
     description: Các API liên quan đến destination
+  - name: Blog
+    description: Các API liên quan đến blog
 paths:
   # Auth API
   /api/user/register:
@@ -730,3 +732,126 @@ paths:
           content:
             application/json:
               example: {}
+# Blog
+  /api/blog:
+    post:
+      tags:
+        - Blog
+      summary: Tạo bài blog mới
+      description: Tạo bài blog mới
+      operationId: createNewBlog
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin tạo blog
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Blog"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+    get:
+      tags:
+        - Blog
+      summary: Lấy thông tin tất cả bài blog
+      description: Lấy thông tin tất cả bài blog
+      operationId: getBlogs
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/blog/{id}:
+    put:
+      tags:
+        - Blog
+      summary: Cập nhật bài blog
+      description: Cập nhật bài blog
+      operationId: updateBlog
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của bài blog cần cập nhật
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Thông tin cập nhật
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Blog"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+    delete:
+      tags:
+        - Blog
+      summary: Xóa bài blog
+      description: Xóa bài blog
+      operationId: deleteBlog
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của Blog cần xóa
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+  /api/blog/like/{id}:
+    put:
+      tags:
+        - Blog
+      summary: Like bài blog
+      description: Like bài blog
+      operationId: likeBlog
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID của bài blog cần like
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          content:
+            application/json:
+              example: {}
+    /api/blog/dislike/{id}:
+      put:
+        tags:
+          - Blog
+        summary: dislike bài blog
+        description: dislike bài blog
+        operationId: dislikeBlog
+        security:
+          - BearerAuth: []
+        parameters:
+          - name: id
+            in: path
+            description: ID của bài blog cần dislike
+            required: true
+            schema:
+              type: string
+        responses:
+          default:
+            content:
+              application/json:
+                example: {}

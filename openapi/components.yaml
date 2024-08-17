@@ -219,6 +219,15 @@ components:
           type: string
           format: ObjectId
           example: "667ae06b7972283ba7879dae"
+    Blog: 
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Lạc Tiên Giới Đà Lạt"
+        description:
+          type: string
+          example: "Lạc Tiên Giới Đà Lạt - địa điểm sống ảo nghìn like ....."
   securitySchemes:
     BearerAuth:
       type: http
