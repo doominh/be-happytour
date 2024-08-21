@@ -20,9 +20,12 @@ function calculateTotalPrice(adult, children, infant, tourPrice) {
   return Math.round(totalPrice / 1000) * 1000;
 }
 const createBooking = asyncHandler(async (req, res) => {
-  const { tourId, tripId, adult, children, infant } = req.body;
+  const { tourId, tripId, adult, children, infant, address } = req.body;
   if (!tourId || !adult) throw new Error("Missing inputs");
   const { _id } = req.user;
+  if (address) {
+    await User.findByIdAndUpdate(_id, { address });
+  }
   const tour = await Tour.findById(tourId);
   const tourPrice = tour?.price;
   // Gán giá trị mặc định nếu không có trong yêu cầu
@@ -126,7 +129,7 @@ const getBookings = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   queryCommand.skip(skip).limit(limit);
 
-  queryCommand = queryCommand.populate('orderBy', 'firstname lastname');
+  queryCommand = queryCommand.populate("orderBy", "firstname lastname");
   try {
     const response = await queryCommand.exec();
     const counts = await Booking.find(formatedQueries).countDocuments();

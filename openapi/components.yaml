@@ -123,6 +123,14 @@ components:
             - luxury
             - budget
           example: "couple"
+        startDate:
+          type: string
+          format: ISO8601
+          example: 2024-06-18T19:21:19.282Z
+        endDate:
+          type: string
+          format: ISO8601
+          example: 2024-06-18T19:21:19.282Z
     Category:
       type: object
       properties:

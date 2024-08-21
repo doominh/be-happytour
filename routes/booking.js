@@ -6,6 +6,6 @@ router.post("/", verifyAccessToken, ctrls.createBooking);
 router.get("/", [verifyAccessToken, isAdmin], ctrls.getBookings);
 router.get("/current", verifyAccessToken, ctrls.getUserBooking);
 
-router.put("/status/:bid", [verifyAccessToken, isAdmin], ctrls.updateStatus);
+router.put("/status/:bid", [verifyAccessToken], ctrls.updateStatus);
 
 module.exports = router;

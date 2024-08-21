@@ -13,7 +13,7 @@ var bookingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: "Processing",
+      default: "Cancelled",
       enum: ["Cancelled", "Processing", "Success"],
     },
     orderBy: {
@@ -22,18 +22,18 @@ var bookingSchema = new mongoose.Schema(
     },
     adult: {
       type: Number,
-      required: true
+      required: true,
     },
     children: {
       type: Number,
-      default: 0
+      default: 0,
     },
     infant: {
       type: Number,
-      default: 0
+      default: 0,
     },
     total: {
-      type: Number
+      type: Number,
     },
   },
   { timestamps: true }
