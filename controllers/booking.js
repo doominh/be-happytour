@@ -82,13 +82,74 @@ const updateStatus = asyncHandler(async (req, res) => {
 
 const getUserBooking = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const response = await Booking.find({ orderBy: _id })
+  // const response = await Booking.find({ orderBy: _id })
+  //   .populate("tour", "name price")
+  //   .populate("trip", "vehicel licensePlate");
+  // res.status(200).json({
+  //   success: response ? true : false,
+  //   bookingData: response ? response : "Cannot get user's booking list",
+  // });
+  const queries = { ...req.query };
+  // Tách các trường đặc biệt ra khỏi query
+  const excludeFields = ["limit", "sort", "page", "fields"];
+  excludeFields.forEach((el) => delete queries[el]);
+
+  // Format lại các operators cho đúng cú pháp của mongoose
+  let queryString = JSON.stringify(queries);
+  queryString = queryString.replace(
+    /\b(gte|gt|lt|lte)\b/g,
+    (matchedEl) => `$${matchedEl}`
+  );
+  const formatedQueries = JSON.parse(queryString);
+
+  // // Filtering
+  // if (queries?.name)
+  //   formatedQueries.name = { $regex: queries.name, $options: "i" };
+
+  // let queryObject = {};
+  // if (queries?.q) {
+  //   delete formatedQueries.q
+  //   queryObject = {
+  //     $or: [
+  //       {color: {$regex: queries.q, $option: 'i'}}
+  //     ]
+  //   }
+  // }
+  const qr = { formatedQueries };
+
+  let queryCommand = Booking.find({ orderBy: _id })
     .populate("tour", "name price")
-    .populate("trip", "vehicel licensePlate");
-  res.status(200).json({
-    success: response ? true : false,
-    bookingData: response ? response : "Cannot get user's booking list",
-  });
+    .populate("trip", "vehicel licensePlate")
+
+  // Sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    queryCommand = queryCommand.sort(sortBy);
+  }
+
+  // Fields limiting
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    queryCommand = queryCommand.select(fields);
+  }
+
+  // Pagination
+  const page = +req.query.page || 1;
+  const limit = +req.query.limit || process.env.LIMIT_BOOKINGS;
+  const skip = (page - 1) * limit;
+  queryCommand.skip(skip).limit(limit);
+
+  try {
+    const response = await queryCommand.exec();
+    const counts = await Booking.find(formatedQueries).countDocuments();
+    return res.status(200).json({
+      success: response ? true : false,
+      counts,
+      bookingData: response ? response : "Cannot get booking",
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
 });
 
 const getBookings = asyncHandler(async (req, res) => {
@@ -129,7 +190,6 @@ const getBookings = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   queryCommand.skip(skip).limit(limit);
 
-  queryCommand = queryCommand.populate("orderBy", "firstname lastname");
   try {
     const response = await queryCommand.exec();
     const counts = await Booking.find(formatedQueries).countDocuments();
