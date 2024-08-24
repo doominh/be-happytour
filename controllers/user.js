@@ -300,11 +300,66 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 const getUsers = asyncHandler(async (req, res) => {
-  const response = await User.find().select("-refreshToken -password -role");
-  return res.status(200).json({
-    success: response ? true : false,
-    users: response,
-  });
+  // const response = await User.find().select("-refreshToken -password -role");
+  // return res.status(200).json({
+  //   success: response ? true : false,
+  //   users: response,
+  // });
+
+  const queries = { ...req.query };
+  const excludeFields = ["limit", "sort", "page", "fields"];
+  excludeFields.forEach((el) => delete queries[el]);
+
+  let queryString = JSON.stringify(queries);
+  queryString = queryString.replace(
+    /\b(gte|gt|lt|lte)\b/g,
+    (matchedEl) => `$${matchedEl}`
+  );
+  const formatedQueries = JSON.parse(queryString);
+
+  // Filtering
+  if (queries?.name)
+    formatedQueries.name = { $regex: queries.name, $options: "i" };
+  if(req.query.q) {
+    delete formatedQueries.q
+    formatedQueries['$or'] = [
+      {firstname: { $regex: req.query.q, $options: "i" }},
+      {lastname: { $regex: req.query.q, $options: "i" }},
+      {email: { $regex: req.query.q, $options: "i" }}
+    ]
+  }
+  let queryCommand = User.find(formatedQueries);
+
+  // Sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    queryCommand = queryCommand.sort(sortBy);
+  }
+
+  // Fields limiting
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    queryCommand = queryCommand.select(fields);
+  }
+  // Pagination
+  // limit: số object lấy về 1 lần gọi API trong 1 trang
+  // Skip: 2 => bỏ qua 2 object đầu tiên
+  const page = +req.query.page || 1;
+  const limit = +req.query.limit || process.env.LIMIT_USERS;
+  const skip = (page - 1) * limit;
+  queryCommand.skip(skip).limit(limit);
+
+  try {
+    const response = await queryCommand.exec();
+    const counts = await User.find(formatedQueries).countDocuments();
+    return res.status(200).json({
+      success: response ? true : false,
+      counts,
+      users: response ? response : "Cannot get users",
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
