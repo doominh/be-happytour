@@ -115,10 +115,10 @@ const getUserBooking = asyncHandler(async (req, res) => {
   //     ]
   //   }
   // }
-  const qr = { formatedQueries };
+  const qr = { ...formatedQueries, orderBy: _id };
 
-  let queryCommand = Booking.find({ orderBy: _id })
-    .populate("tour", "name price")
+  let queryCommand = Booking.find(qr)
+    .populate("tour", "name price thumb images")
     .populate("trip", "vehicel licensePlate")
 
   // Sorting
@@ -141,7 +141,7 @@ const getUserBooking = asyncHandler(async (req, res) => {
 
   try {
     const response = await queryCommand.exec();
-    const counts = await Booking.find(formatedQueries).countDocuments();
+    const counts = await Booking.find(qr).countDocuments();
     return res.status(200).json({
       success: response ? true : false,
       counts,

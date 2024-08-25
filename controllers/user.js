@@ -93,9 +93,9 @@ const register = asyncHandler(async (req, res) => {
         subject: "Confirm register account Happy Tour",
       });
     }
-    setTimeout(async() => {
-      await User.deleteOne({email: emailEdited})
-    },[300000])
+    setTimeout(async () => {
+      await User.deleteOne({ email: emailEdited });
+    }, [300000]);
     return res.json({
       success: newUser ? true : false,
       mes: newUser
@@ -136,7 +136,7 @@ const finalRegister = asyncHandler(async (req, res) => {
   return res.json({
     success: notActiveEmail ? true : false,
     response: notActiveEmail
-      ? 'Register is succesfully. Please go to login.'
+      ? "Register is succesfully. Please go to login."
       : "Something went wrong, please try later.",
   });
   // if (!cookie || cookie?.dataregister?.token !== token) {
@@ -320,15 +320,15 @@ const getUsers = asyncHandler(async (req, res) => {
   // Filtering
   if (queries?.name)
     formatedQueries.name = { $regex: queries.name, $options: "i" };
-  if(req.query.q) {
-    delete formatedQueries.q
-    formatedQueries['$or'] = [
-      {firstname: { $regex: req.query.q, $options: "i" }},
-      {lastname: { $regex: req.query.q, $options: "i" }},
-      {email: { $regex: req.query.q, $options: "i" }}
-    ]
+  if (req.query.q) {
+    delete formatedQueries.q;
+    formatedQueries["$or"] = [
+      { firstname: { $regex: req.query.q, $options: "i" } },
+      { lastname: { $regex: req.query.q, $options: "i" } },
+      { email: { $regex: req.query.q, $options: "i" } },
+    ];
   }
-  let queryCommand = User.find(formatedQueries);
+  let queryCommand = User.find(formatedQueries)
 
   // Sorting
   if (req.query.sort) {
@@ -375,9 +375,9 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const {firstname, lastname, email, mobile, address} = req.body;
-  const data = {firstname, lastname, email, mobile, address}
-  if (req.file) data.avatar = req.file.path
+  const { firstname, lastname, email, mobile, address } = req.body;
+  const data = { firstname, lastname, email, mobile, address };
+  if (req.file) data.avatar = req.file.path;
   if (!_id || Object.keys(req.body).length === 0)
     throw new Error("Missing inputs");
   const response = await User.findByIdAndUpdate(_id, data, {
@@ -385,7 +385,7 @@ const updateUser = asyncHandler(async (req, res) => {
   }).select("-password -role -refreshToken");
   return res.status(200).json({
     success: response ? true : false,
-    mes: response ? 'Updated' : "Something went wrong",
+    mes: response ? "Updated" : "Something went wrong",
   });
 });
 
