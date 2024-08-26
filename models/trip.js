@@ -20,6 +20,10 @@ var tripSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  departureTime: {
+    type: Date,
+    required: true,
+  },
 });
 
 //Export the model

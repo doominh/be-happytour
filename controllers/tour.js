@@ -24,7 +24,7 @@ const createTour = asyncHandler(async (req, res) => {
 const getTour = asyncHandler(async (req, res) => {
   const { tid } = req.params;
   const tour = await Tour.findById(tid)
-    .populate("trip", "vehicel licensePlate")
+    .populate("trip", "vehicel licensePlate departureTime")
     .populate("destination", "name description hotel address")
     .populate("category", "name")
     .populate({
