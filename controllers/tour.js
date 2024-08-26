@@ -7,8 +7,13 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 
 const createTour = asyncHandler(async (req, res) => {
-  if (Object.keys(req.body).length === 0) throw new Error("Missing inputs");
-  if (req.body && req.body.name) req.body.slug = slugify(req.body.name);
+  const {name, price, description,category, tourType} = req.body;
+  const thumb = req.files?.thumb[0].path;
+  const images = req.files?.images?.map(el => el.path);
+  if (!(name, price, description, category, tourType)) throw new Error("Missing inputs");
+  req.body.slug = slugify(req.body.name);
+  if (thumb) req.body.thumb = thumb;
+  if (images) req.body.images = images;
   const newTour = await Tour.create(req.body);
   return res.status(200).json({
     success: newTour ? true : false,
