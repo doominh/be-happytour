@@ -5,10 +5,10 @@ components:
       properties:
         email:
           type: string
-          example: doominh20y@gmail.com
+          example: admin@gmail.com
         password:
           type: string
-          example: "123123"
+          example: "123456"
     RegisterBody:
       type: object
       properties:
@@ -20,7 +20,7 @@ components:
           example: "I'am"
         email:
           type: string
-          example: "admin123@gmail.com"
+          example: "admin@gmail.com"
         password:
           type: string
           example: "123456"
