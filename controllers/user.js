@@ -188,7 +188,6 @@ const login = asyncHandler(async (req, res) => {
     return res.status(200).json({
       success: true,
       accessToken,
-      role,
       userData,
     });
   } else {
