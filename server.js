@@ -32,8 +32,18 @@ const port = process.env.PORT || 8888;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  process.env.LOCAL_URL,
+];
 app.use(cors({
-  origin: process.env.CLIENT_URL || process.env.LOCAL_URL,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['POST', 'PUT', 'GET', 'DELETE'],
   credentials: true
 }));
